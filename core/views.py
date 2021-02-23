@@ -39,6 +39,28 @@ class PostView(APIView):
             return Response(serializer.errors)
 
 
+class PostViewDetail(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, pk):
+        post = Post.objects.get(pk=pk)
+        serializer = PostSerializers(post)
+        return Response(serializer.data)
+
+    def put(self, request, pk): 
+        post = Post.objects.get(pk=pk)
+        serializer = PostSerializers(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        post = Post.objects.get(pk=pk)
+        post.delete()
+        return Response({'message': 'Deleted post'})
+
 # def test_view(request):
 #     data = {  
 #         'name': 'Son',
