@@ -2,6 +2,7 @@ from django.http import JsonResponse, request
 from django.shortcuts import render
 from rest_framework import serializers
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,20 +23,21 @@ class TestView(APIView):
 
 class PostView(APIView):
 
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         posts = Post.objects.all()
         serializer = PostSerializers(posts, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        print(request.data)
-        print(type(request.data))
         serializer = PostSerializers(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
 
 # def test_view(request):
 #     data = {  
