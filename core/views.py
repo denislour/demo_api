@@ -1,8 +1,14 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, request
 from django.shortcuts import render
+from rest_framework import serializers
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+
+from .serializers import PostSerializers
+from .models import Post
+
 
 class TestView(APIView):
 
@@ -13,8 +19,26 @@ class TestView(APIView):
         }
         return Response(data)
 
+
+class PostView(APIView):
+
+    def get(self, request):
+        posts = Post.objects.all()
+        serializer = PostSerializers(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        print(request.data)
+        print(type(request.data))
+        serializer = PostSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
 # def test_view(request):
-#     data = {
+#     data = {  
 #         'name': 'Son',
 #         'age': '28',
 #     }
